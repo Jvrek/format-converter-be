@@ -24,7 +24,7 @@ public class FilesStorageService implements IFilesStorageService {
         try {
             if(!Files.exists(root)){
                 Files.createDirectory(root);
-            };
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize main folder for upload!");
         }
@@ -59,7 +59,6 @@ public class FilesStorageService implements IFilesStorageService {
                 }
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Error: " + e.getMessage());
-
             }
         }else {
             throw new RuntimeException("Could not read the file path!");
