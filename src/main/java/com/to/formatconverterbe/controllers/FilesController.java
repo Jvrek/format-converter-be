@@ -1,5 +1,7 @@
 package com.to.formatconverterbe.controllers;
 
+import com.to.formatconverterbe.converters.CSVWriter;
+import com.to.formatconverterbe.converters.JSONFlattener;
 import com.to.formatconverterbe.fileReader.ResourceReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -16,6 +18,8 @@ import com.to.formatconverterbe.services.FilesStorageService;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -48,6 +52,14 @@ public class FilesController {
         Resource file = storageService.load(filename);
 
         ResourceReader.asString(file);
+        System.out.println(ResourceReader.asString(file));
+
+        List<Map<String, String>> flatJson = JSONFlattener.parseJson(ResourceReader.asString(file));
+
+        String csvString = CSVWriter.getCSV(flatJson);
+
+        System.out.println(csvString);
+
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
