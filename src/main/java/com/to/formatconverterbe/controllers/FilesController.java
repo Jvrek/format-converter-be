@@ -1,6 +1,6 @@
 package com.to.formatconverterbe.controllers;
 
-import com.to.formatconverterbe.converters.CSVWriter;
+import com.to.formatconverterbe.converters.CSVConverter;
 import com.to.formatconverterbe.converters.JSONFlattener;
 import com.to.formatconverterbe.fileReader.ResourceReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,19 +9,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.to.formatconverterbe.messages.ResponseMessage;
 import com.to.formatconverterbe.services.FilesStorageService;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
 import java.util.Map;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @CrossOrigin("*")
 @Controller
@@ -56,7 +50,9 @@ public class FilesController {
 
         List<Map<String, String>> flatJson = JSONFlattener.parseJson(ResourceReader.asString(file));
 
-        String csvString = CSVWriter.getCSV(flatJson);
+        String csvString = CSVConverter.getCSV(flatJson);
+
+        CSVConverter.writeToFile(csvString,"uploads/text.csv");
 
         System.out.println(csvString);
 

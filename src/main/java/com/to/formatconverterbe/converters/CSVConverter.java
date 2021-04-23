@@ -1,5 +1,10 @@
 package com.to.formatconverterbe.converters;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -8,10 +13,11 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.commons.io.FileUtils;
 
-public class CSVWriter {
+public class CSVConverter {
 
-    private static final Logger LOGGER = Logger.getLogger(CSVWriter.class);
+    private static final Logger LOGGER = Logger.getLogger(CSVConverter.class);
 
     public static String getCSV(List<Map<String, String>> flatJson) {
         // Use the default separator
@@ -37,6 +43,14 @@ public class CSVWriter {
         }
 
         return headers;
+    }
+
+    public static void writeToFile(String csvString, String fileName) {
+        try {
+            FileUtils.write(new File(fileName), csvString);
+        } catch (IOException e) {
+            LOGGER.error("CSVWriter#writeToFile(csvString, fileName) IOException: ", e);
+        }
     }
 
     private static String getSeperatedColumns(Set<String> headers, Map<String, String> map, String separator) {
