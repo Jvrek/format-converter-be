@@ -2,9 +2,6 @@ package com.to.formatconverterbe.converters;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,7 +26,7 @@ public class CSVConverter {
         String csvString = StringUtils.join(headers.toArray(), separator) + "\n";
 
         for (Map<String, String> map : flatJson) {
-            csvString = csvString + getSeperatedColumns(headers, map, separator) + "\n";
+            csvString = csvString + getSeparatedColumns(headers, map, separator) + "\n";
         }
 
         return csvString;
@@ -53,7 +50,7 @@ public class CSVConverter {
         }
     }
 
-    private static String getSeperatedColumns(Set<String> headers, Map<String, String> map, String separator) {
+    private static String getSeparatedColumns(Set<String> headers, Map<String, String> map, String separator) {
         List<String> items = new ArrayList<String>();
         for (String header : headers) {
             String value = map.get(header) == null ? "" : map.get(header).replaceAll("[\\,\\;\\r\\n\\t\\s]+", " ");

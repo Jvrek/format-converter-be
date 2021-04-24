@@ -1,6 +1,7 @@
 package com.to.formatconverterbe.controllers;
 
 import com.to.formatconverterbe.converters.CSVConverter;
+import com.to.formatconverterbe.converters.CsvToJsonConverter;
 import com.to.formatconverterbe.converters.JSONFlattener;
 import com.to.formatconverterbe.fileReader.ResourceReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,20 +45,27 @@ public class FilesController {
     @ResponseBody
     public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename) {
         Resource file = storageService.load(filename);
+        Resource file2 = storageService.load("student.csv");
+
 
         ResourceReader.asString(file);
-        System.out.println(ResourceReader.asString(file));
+        //System.out.println(ResourceReader.asString(file));
 
         List<Map<String, String>> flatJson = JSONFlattener.parseJson(ResourceReader.asString(file));
+
+         String jSONFROMCSV  = CsvToJsonConverter.csvTojson(ResourceReader.asString(file2));
 
         String csvString = CSVConverter.getCSV(flatJson);
 
         CSVConverter.writeToFile(csvString,"uploads/text.csv");
 
-        System.out.println(csvString);
+       // System.out.println(csvString);
+        System.out.println(jSONFROMCSV);
 
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
+
+
 }
