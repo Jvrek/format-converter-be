@@ -77,6 +77,35 @@ public class FilesController {
 
         }
 
+
+        if(fileExtension.equals("json") && converted.equals("xml")){
+            Resource fileStored = storageService.load(file.getOriginalFilename());
+
+            List<Map<String, String>> flatJson = JSONFlattener.parseJson(ResourceReader.asString(fileStored));
+
+            CSVConverter.writeToFile(CSVConverter.getCSV(flatJson),"uploads/" + fileName +".xml");
+            message = fileName + ".xml";
+
+            storageService.delete(file.getOriginalFilename());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+
+        }
+
+        if(fileExtension.equals("xml") && converted.equals("json")){
+
+            Resource fileStored = storageService.load(file.getOriginalFilename());
+
+            String jSONFROMCSV  = CsvToJsonConverter.csvTojson(ResourceReader.asString(fileStored));
+
+            CSVConverter.writeToFile(jSONFROMCSV,"uploads/" + fileName + ".json");
+            message = fileName + ".json";
+
+            //storageService.delete(file.getOriginalFilename());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+
+        }
+
+
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("Error during conversion"));
     }
 
