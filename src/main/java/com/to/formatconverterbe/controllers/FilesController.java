@@ -11,13 +11,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.to.formatconverterbe.messages.ResponseMessage;
 import com.to.formatconverterbe.services.FilesStorageService;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @CrossOrigin("*")
 @Controller
@@ -26,20 +33,6 @@ public class FilesController {
 
     @Autowired
     FilesStorageService storageService;
-
-//    @PostMapping("/files/upload")
-//    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
-//        String message = "";
-//
-//        try {
-//            storageService.save(file);
-//            message = "Uploaded the file successfully: " + file.getOriginalFilename();
-//            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-//        } catch (Exception e) {
-//            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-//            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-//        }
-//    }
 
 
     @PostMapping("v2/files/upload")
@@ -64,6 +57,8 @@ public class FilesController {
         CSVConverter.writeToFile(CSVConverter.getCSV(flatJson),"uploads/" + fileName +".csv");
         message = fileName + ".csv";
 
+        storageService.delete(file.getOriginalFilename());
+
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
 
         }
@@ -77,10 +72,10 @@ public class FilesController {
             CSVConverter.writeToFile(jSONFROMCSV,"uploads/" + fileName + ".json");
             message = fileName + ".json";
 
+            storageService.delete(file.getOriginalFilename());
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
 
         }
-
 
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("Error during conversion"));
     }
@@ -90,33 +85,25 @@ public class FilesController {
     public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename){
         Resource file = storageService.load(filename);
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+        System.out.println(file.getFilename());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+
     }
 
-//    @GetMapping("/file/{filename:.+}")
-//    @ResponseBody
-//    public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename) {
-//        Resource file = storageService.load(filename);
-//        Resource file2 = storageService.load("student.csv");
-//        ResourceReader.asString(file);
-//        //System.out.println(ResourceReader.asString(file));
-//
-//        List<Map<String, String>> flatJson = JSONFlattener.parseJson(ResourceReader.asString(file));
-//
-//         String jSONFROMCSV  = CsvToJsonConverter.csvTojson(ResourceReader.asString(file2));
-//
-//        String csvString = CSVConverter.getCSV(flatJson);
-//
-//        CSVConverter.writeToFile(csvString,"uploads/text.csv");
-//
-//       // System.out.println(csvString);
-//        System.out.println(jSONFROMCSV);
-//
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-//    }
+    @GetMapping("/content/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<String> getString(@PathVariable("filename") String filename){
+        Resource file = storageService.load(filename);
 
+        try (Reader reader = new InputStreamReader(file.getInputStream(), UTF_8)) {
+            String fileAsString = FileCopyUtils.copyToString(reader);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(fileAsString);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 }

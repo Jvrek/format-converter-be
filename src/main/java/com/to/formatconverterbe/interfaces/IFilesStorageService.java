@@ -13,6 +13,8 @@ public interface IFilesStorageService {
 
     public Resource load(String filename);
 
+    public void delete(String filename);
+
     //public void deleteAll();
 
 }

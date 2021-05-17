@@ -5,12 +5,11 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.to.formatconverterbe.interfaces.IFilesStorageService;
 
@@ -28,6 +27,8 @@ public class FilesStorageService implements IFilesStorageService {
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize main folder for upload!");
         }
+
+
     }
 
     @Override
@@ -65,9 +66,25 @@ public class FilesStorageService implements IFilesStorageService {
         }
     }
 
-    //@Override
-    //public void deleteAll() {
-        //FileSystemUtils.deleteRecursively(root.toFile());
-    //}
+    @Override
+    public void delete(String filename) {
+        if (Files.exists(root)) {
+            try {
+                Path file = root.resolve(filename);
+                Resource resource = new UrlResource(file.toUri());
+                if (resource.exists()) {
+                    Files.delete(file);
+                } else {
+                    throw new RuntimeException("File don`t exist!");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            throw new RuntimeException("Could not read the file path!");
+        }
+
+    }
+
 
 }
