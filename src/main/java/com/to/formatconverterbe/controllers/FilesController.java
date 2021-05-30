@@ -3,8 +3,10 @@ package com.to.formatconverterbe.controllers;
 import com.to.formatconverterbe.converters.CSVConverter;
 import com.to.formatconverterbe.converters.CsvToJsonConverter;
 import com.to.formatconverterbe.converters.JSONFlattener;
+import com.to.formatconverterbe.converters.XMLtoJSON;
 import com.to.formatconverterbe.fileReader.FileName;
 import com.to.formatconverterbe.fileReader.ResourceReader;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -35,8 +37,10 @@ public class FilesController {
     FilesStorageService storageService;
 
 
+    @SneakyThrows
     @PostMapping("v2/files/upload")
-    public ResponseEntity<ResponseMessage> fileConversion(@RequestParam("file") MultipartFile file,@RequestParam String converted) {
+    public ResponseEntity<ResponseMessage> fileConversion(@RequestParam("file") MultipartFile file
+            ,@RequestParam String converted) {
         String message = "";
         String fileExtension = FileName.getFileExtension(file.getOriginalFilename());
         String fileName = FileName.getFileNameWithoutExtension(file.getOriginalFilename());
@@ -77,6 +81,22 @@ public class FilesController {
 
         }
 
+        if(fileExtension.equals("xml") && converted.equals("json")){
+
+            Resource fileStored = storageService.load(file.getOriginalFilename());
+
+            //String jSONFROMCSV  = CsvToJsonConverter.csvTojson(ResourceReader.asString(fileStored));
+
+            String jsonFormated = XMLtoJSON.convertToJson(fileStored.getFile());
+
+            CSVConverter.writeToFile(jsonFormated,"uploads/" + fileName + ".json");
+            message = fileName + ".json";
+
+            storageService.delete(file.getOriginalFilename());
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
+
+        }
+
 
         if(fileExtension.equals("json") && converted.equals("xml")){
             Resource fileStored = storageService.load(file.getOriginalFilename());
@@ -91,19 +111,7 @@ public class FilesController {
 
         }
 
-        if(fileExtension.equals("xml") && converted.equals("json")){
 
-            Resource fileStored = storageService.load(file.getOriginalFilename());
-
-            String jSONFROMCSV  = CsvToJsonConverter.csvTojson(ResourceReader.asString(fileStored));
-
-            CSVConverter.writeToFile(jSONFROMCSV,"uploads/" + fileName + ".json");
-            message = fileName + ".json";
-
-            //storageService.delete(file.getOriginalFilename());
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-
-        }
 
 
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("Error during conversion"));
