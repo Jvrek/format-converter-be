@@ -1,6 +1,7 @@
 package com.to.formatconverterbe.converters;
 
 import lombok.SneakyThrows;
+import org.json.XML;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,16 +27,14 @@ public class XMLtoJSON {
             printResult(root.getChildNodes(), depth, sb);
             sb.append("}");
             // System.out.println("}");
-
         }
         //System.out.println("}");
         sb.append("}");
 
-        System.out.println(sb.toString());
         return sb.toString();
     }
 
-
+    @SneakyThrows
     private static void printResult(NodeList nodeList, int depth, StringBuilder sb) {
         depth++;
         boolean open = false, endOfArray = false, isArray = false;
@@ -84,11 +83,15 @@ public class XMLtoJSON {
 
 
                     if(tempNode.hasChildNodes()){
-
-                        if(tempNode.getFirstChild().getNodeValue().isBlank())
-                            // System.out.print(":");
+                        try {
+                            if (!tempNode.getNextSibling().getNextSibling().getNodeName().equals(tempNode.getNodeName())
+                                    && !tempNode.getPreviousSibling().getPreviousSibling().getNodeName().equals(tempNode.getNodeName())) {
+                                sb.append(":");
+                            }
+                        }catch (Exception e){
                             sb.append(":");
-                        printResult(tempNode.getChildNodes(), depth,sb);
+                        }
+                        printResult(tempNode.getChildNodes(), depth, sb);
                     }
                 }
             }
@@ -125,6 +128,7 @@ public class XMLtoJSON {
         }
     }
 
+    @SneakyThrows
     private static boolean handleNodeWithAttributes(int depth, boolean isArray,
                                                     Node tempNode, StringBuilder sb) {
         // get attributes names and values
@@ -146,7 +150,6 @@ public class XMLtoJSON {
         //System.out.print("\""+"text"+"\"");
         sb.append("\""+"text"+"\"");
         if(tempNode.hasChildNodes()){
-            // System.out.print(":");
             sb.append(":");
         }
         printResult(tempNode.getChildNodes(), depth,sb);
