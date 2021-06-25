@@ -15,17 +15,8 @@ import org.json.JSONObject;
 
 public class JSONFlattener {
 
-    /**
-     * The JSONObject type
-     */
     private static final Class<?> JSON_OBJECT = JSONObject.class;
-    /**
-     * The JSONArray type
-     */
     private static final Class<?> JSON_ARRAY = JSONArray.class;
-    /**
-     * The class Logger
-     */
     private static final Logger LOGGER = Logger.getLogger(JSONFlattener.class);
 
     public static List<Map<String, String>> parseJson(String json) {
@@ -46,7 +37,6 @@ public class JSONFlattener {
     public static Map<String, String> parse(JSONObject jsonObject) {
         Map<String, String> flatJson = new LinkedHashMap<String, String>();
         flatten(jsonObject, flatJson, "");
-
         return flatJson;
     }
 
@@ -90,7 +80,6 @@ public class JSONFlattener {
                 }
             }
         }
-
     }
 
     private static void flatten(JSONArray obj, Map<String, String> flatJson, String prefix) {
@@ -100,7 +89,6 @@ public class JSONFlattener {
             if (obj.get(i).getClass() == JSON_ARRAY) {
                 JSONArray jsonArray = (JSONArray) obj.get(i);
 
-                // jsonArray is empty
                 if (jsonArray.length() < 1) {
                     continue;
                 }
@@ -126,7 +114,6 @@ public class JSONFlattener {
             JSONArray jsonArray = new JSONArray(json);
             flatJson = parse(jsonArray);
         } catch (Exception e) {
-            // throw new Exception("Json might be malformed");
             LOGGER.error("JSON might be malformed, Please verify that your JSON is valid");
         }
         return flatJson;

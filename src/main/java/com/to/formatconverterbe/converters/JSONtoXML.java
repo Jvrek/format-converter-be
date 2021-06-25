@@ -33,7 +33,6 @@ public class JSONtoXML {
 
                 return sb.toString();
             } else {
-                //escape
                 string = object == null ? "null" : object.toString();
                 return tagName == null ? "\"" + string + "\"" : (string.length() == 0 ? "<" + tagName + "/>" : "<" + tagName + ">" + string + "</" + tagName + ">");
             }
@@ -71,11 +70,9 @@ public class JSONtoXML {
                                     if (i > 0) {
                                         sb.append('\n');
                                     }
-                                    //escape
                                     sb.append(ja.get(i).toString());
                                 }
                             } else {
-                                //escape
                                 sb.append(value.toString());
                             }
                         } else if (value instanceof JSONArray) {
@@ -116,34 +113,4 @@ public class JSONtoXML {
             }
         }
     }
-
-//    public static String escape(String string) {
-//        StringBuffer sb = new StringBuffer();
-//        int i = 0;
-//
-//        for(int length = string.length(); i < length; ++i) {
-//            char c = string.charAt(i);
-//            switch(c) {
-//                case '"':
-//                    sb.append("&quot;");
-//                    break;
-//                case '&':
-//                    sb.append("&amp;");
-//                    break;
-//                case '\'':
-//                    sb.append("&apos;");
-//                    break;
-//                case '<':
-//                    sb.append("&lt;");
-//                    break;
-//                case '>':
-//                    sb.append("&gt;");
-//                    break;
-//                default:
-//                    sb.append(c);
-//            }
-//        }
-//
-//        return sb.toString();
-//    }
 }

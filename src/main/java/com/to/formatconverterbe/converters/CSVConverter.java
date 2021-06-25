@@ -17,7 +17,6 @@ public class CSVConverter {
     private static final Logger LOGGER = Logger.getLogger(CSVConverter.class);
 
     public static String getCSV(List<Map<String, String>> flatJson) {
-        // Use the default separator
         return getCSV(flatJson, ",");
     }
 

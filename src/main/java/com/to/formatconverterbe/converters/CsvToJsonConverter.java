@@ -2,12 +2,8 @@ package com.to.formatconverterbe.converters;
 
 public class CsvToJsonConverter {
 
-
     public static String csvTojson(String content,String separator){
-
-        //
         StringBuilder sb=new StringBuilder("[\n");
-
         String csv = content;
         if(csv.contains("\"")){
             csv.replaceAll("\"","");
@@ -34,14 +30,10 @@ public class CsvToJsonConverter {
                 sb.append("\t}\n");
             }
         }
-
         sb.append("]");
-
         return sb.toString();
     }
-
     public static  String csvTojson(String content){
         return csvTojson(content,",");
     }
-
 }

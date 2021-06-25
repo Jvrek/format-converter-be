@@ -13,7 +13,6 @@ public class XMLConverter {
     private static final Logger LOGGER = Logger.getLogger(CSVConverter.class);
 
     public static String getXML(List<Map<String, String>> flatJson) {
-        // Use the default separator
         return getXML(flatJson, ",");
     }
 
