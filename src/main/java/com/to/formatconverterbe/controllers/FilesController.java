@@ -121,14 +121,17 @@ public class FilesController {
 
     @GetMapping("/file/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename){
+    public void getFile(@PathVariable("filename") String filename){
+       getFileFromServer(filename);
+       storageService.delete(filename);
+    }
+
+    public ResponseEntity<Resource> getFileFromServer(String filename){
         Resource file = storageService.load(filename);
 
-        System.out.println(file.getFilename());
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-
+        storageService.delete(filename);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
     @GetMapping("/content/{filename:.+}")
@@ -138,6 +141,7 @@ public class FilesController {
 
         try (Reader reader = new InputStreamReader(file.getInputStream(), UTF_8)) {
             String fileAsString = FileCopyUtils.copyToString(reader);
+            storageService.delete(filename);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(fileAsString);
         } catch (IOException e) {
